@@ -37,7 +37,7 @@ python reproduction/generate_data.py StyleGAN2 third_party/stylegan2 generate-im
 ## Apply configurations
 
 - Read `protocols`, `shared_settings` and `new_experiments` in JSON.
-- Apply settings manually; existing scripts do not load JSON.
+- Set the parameters in `train.py` and `test.py` according to `experiments.json`.
 - `train.py`: set `TRAIN_DOMAINS`, `TRAIN_COVER_DIRS`; both dataset calls use `samples_per_domain=20000`.
 - Source train/validation: 9:1. Checkpoint: highest validation ACC; save condition `if val_acc > best_acc:`.
 - Run `SITRANET_SEED=42 python train.py`; repeat for the other configured seeds.
@@ -80,7 +80,7 @@ python reproduction/generate_data.py StyleGAN2 third_party/stylegan2 generate-im
 ## Encoder backbones
 
 - Protocol 1A; Xception, ResNet-18, EfficientNet. ImageNet initialization.
-- Add encoder branches in `sitranet.py`; the release supports Xception only.
+- Use the selected backbone for both the trace and semantic encoders in `sitranet.py`.
 - Match decoder/fusion input channels. Retrain each variant; retain other settings.
 - Output: ACC for each semantic domain and average ACC.
 
