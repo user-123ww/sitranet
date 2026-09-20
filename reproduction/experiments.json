@@ -1,0 +1,88 @@
+{
+  "protocols": {
+    "1A": {"source_method": "IDEAS", "source_semantics": ["Restaurant", "Cat", "Bridge"], "target_method": "IDEAS", "target_semantics": ["CelebA", "Church", "Bedroom"]},
+    "1B": {"source_method": "IDEAS", "source_semantics": ["CelebA", "Church", "Bedroom"], "target_method": "IDEAS", "target_semantics": ["Restaurant", "Cat", "Bridge"]},
+    "2A": {"source_method": "IDEAS", "source_semantics": ["Restaurant", "Cat", "Bridge"], "target_method": "SI-SWE", "target_semantics": ["FFHQ", "Church", "Bedroom"]},
+    "2B": {"source_method": "SI-SWE", "source_semantics": ["FFHQ", "Church", "Bedroom"], "target_method": "IDEAS", "target_semantics": ["Restaurant", "Cat", "Bridge"]}
+  },
+  "shared_settings": {
+    "image_size": [256, 256],
+    "image_mode": "RGB",
+    "message_bits": {"IDEAS": 256, "SI-SWE": 256},
+    "source_images_per_class_per_domain": 20000,
+    "target_images_per_class_per_domain": 2000,
+    "train_validation_ratio": [9, 1],
+    "epochs": 200,
+    "batch_size": 24,
+    "initialization": {"SITraNet_encoders": "ImageNet", "baselines": "from scratch"},
+    "seeds": [42, 84, 168, 336, 672],
+    "checkpoint_selection": "highest validation ACC",
+    "episodes_per_epoch": 50,
+    "meta_train_domains": 2,
+    "meta_test_domains": 1,
+    "samples_per_class_per_domain": 6,
+    "inner_learning_rate": 0.0005,
+    "outer_learning_rate": 0.001,
+    "num_prototypes": 8,
+    "k_nearest": 3,
+    "prototype_margin": 1.5,
+    "cover_tolerance": 0.1,
+    "reconstruction_loss_weights": {"lambda_1": 0.1, "lambda_2": 1.0, "lambda_3": 0.1},
+    "loss_weights": {"lambda_rec": 1.5, "lambda_ortho": 0.3, "lambda_in": 1.5, "lambda_out": 1.5}
+  },
+  "new_experiments": {
+    "generator_controlled": {
+      "section": "5.2",
+      "protocol": "1B",
+      "models": ["SITraNet", "FMISNet"],
+      "training_cover_source": "semantically matched StyleGAN2",
+      "other_settings": "same as Protocol 1B"
+    },
+    "diffusion_cross_method": {
+      "source_methods": ["CRoSS", "mas_GRDH"],
+      "target_method": "DiffStega",
+      "additional_setting": "GAN-trained models evaluated on DiffStega",
+      "source_semantics": ["Bridge", "Bedroom", "Face"],
+      "target_semantics": ["Bedroom", "Church", "CelebA"],
+      "section": "5.2",
+      "models": ["SITraNet", "FMISNet"]
+    },
+    "post_processing": {
+      "protocol": "1A",
+      "jpeg_quality": [95, 75],
+      "resize": [0.5],
+      "crop": [0.8],
+      "section": "5.2",
+      "models": ["SITraNet", "FMISNet", "SiaStegNet"]
+    },
+    "complementary_metrics": {
+      "models": ["SITraNet", "FMISNet", "SiaStegNet"],
+      "metrics": ["ACC mean and SD", "AUC", "EER", "TPR at 1% FPR", "FPR at 95% TPR"],
+      "independent_runs": 5,
+      "section": "5.2",
+      "protocols": ["1A", "1B"]
+    },
+    "encoder_backbones": {
+      "backbones": ["Xception", "ResNet-18", "EfficientNet"],
+      "initialization": "ImageNet",
+      "other_settings": "same as Protocol 1",
+      "section": "5.3.2",
+      "protocol": "1A"
+    },
+    "computational_efficiency": {
+      "models": ["SITraNet", "FMISNet", "SiaStegNet"],
+      "prototype_counts": [1, 2, 4, 8, 16],
+      "metrics": ["operations", "inference time"],
+      "GPU": "NVIDIA RTX 3090",
+      "section": "5.4"
+    },
+    "semantic_leakage": {
+      "classifier": "logistic regression",
+      "semantic_labels": ["Bedroom", "CelebA", "Church"],
+      "representations": ["SITraNet trace", "SITraNet without disentanglement", "FMISNet", "Xception"],
+      "feature_extractors": "frozen",
+      "section": "5.4",
+      "protocol": "1A"
+    }
+  }
+}
